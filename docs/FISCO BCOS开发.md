@@ -242,5 +242,61 @@ templates/index.html
 
 在命令行中输入`python app.py`即可运行
 
-## 3. 智能合约编写
+## 3. 使用CRUD_Service
+
+
+
+Python SDK提供了CRUD_Service可以以操作数据库的方式来对数据进行操作。
+
+- 引入包
+
+```python
+from client.precompile.crud.crud_service import CRUDService, Table, Entry
+from client.precompile.crud.condition import Condition
+import json
+
+table = Table("testTable", "id", "firstName, lastName")
+crud_serivce = CRUDService("contracts/precompile")
+```
+
+- 建表 Create Table
+
+```
+# create table
+result = crud_serivce.create_table(table)
+print(result)
+```
+
+- 插入数据 Insert Entry
+
+```python
+insertEntry = table.getEntry()
+insertEntry.put("firstName", "f3")
+insertEntry.put("lastName", "l3")
+insertRes = crud_serivce.insert(table, insertEntry)
+```
+
+[注意] `pythonSDK/client/precompile/crud/crud_service.py`中，需要修改`CRUDService.insert()`
+
+```python
+def insert(self, table, entry):
+        """
+        insert(string tableName, string key, string entry,
+               string optional)
+        """
+        ...
+        fn_args = [table.get_table_name(), table.get_table_key(), json.dumps(entry.get_fields()), '']
+        ...
+```
+
+1. 修改dump->dumps
+2. 在fn_args列表添加一个空字符串（代表optional）
+
+- 查询数据
+
+```
+# select
+condition = Condition()
+res = crud_serivce.select(table, condition)
+```
 
