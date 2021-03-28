@@ -244,11 +244,9 @@ templates/index.html
 
 ## 3. 使用CRUD_Service
 
-
-
 Python SDK提供了CRUD_Service可以以操作数据库的方式来对数据进行操作。
 
-- 引入包
+- 引入包，设置表结构（表名，主键，属性），初始化`crud`实例
 
 ```python
 from client.precompile.crud.crud_service import CRUDService, Table, Entry
@@ -256,14 +254,14 @@ from client.precompile.crud.condition import Condition
 import json
 
 table = Table("testTable", "id", "firstName, lastName")
-crud_serivce = CRUDService("contracts/precompile")
+crud_service = CRUDService("contracts/precompile")
 ```
 
 - 建表 Create Table
 
-```
+```python
 # create table
-result = crud_serivce.create_table(table)
+result = crud_service.create_table(table)
 print(result)
 ```
 
@@ -271,32 +269,19 @@ print(result)
 
 ```python
 insertEntry = table.getEntry()
-insertEntry.put("firstName", "f3")
-insertEntry.put("lastName", "l3")
-insertRes = crud_serivce.insert(table, insertEntry)
+insertEntry.put("id", "1")
+insertEntry.put("firstName", "l3")
+insertEntry.put("lastName", "l5")
+insertRes = crud_service.insert(table, insertEntry)
 ```
 
-[注意] `pythonSDK/client/precompile/crud/crud_service.py`中，需要修改`CRUDService.insert()`
-
-```python
-def insert(self, table, entry):
-        """
-        insert(string tableName, string key, string entry,
-               string optional)
-        """
-        ...
-        fn_args = [table.get_table_name(), table.get_table_key(), json.dumps(entry.get_fields()), '']
-        ...
-```
-
-1. 修改dump->dumps
-2. 在fn_args列表添加一个空字符串（代表optional）
-
-- 查询数据
+- 查询数据，注意一定要对主键值进行限制
 
 ```
-# select
 condition = Condition()
-res = crud_serivce.select(table, condition)
+condition.eq("id", "1")
+condition.eq("firstName", "l1")
+res = crud_service.select(table, condition)
+print(res[0])
 ```
 
